@@ -1,12 +1,11 @@
 {
-  "name": "react-window-package",
-  "main": "./src/index.js",
+  "name": "scoped-script",
+  "main": "./dist/index.js",
   "description": "react components for using react as xaml",
   "scripts": {
     "dev": "webpack-dev-server --open "
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "html-webpack-plugin": "^4.4.1",
     "ts-loader": "^8.0.3",
@@ -14,5 +13,6 @@
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
-  }
+  },
+  "version": "0.1.0"
 }

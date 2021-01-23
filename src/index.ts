@@ -1,4 +1,4 @@
-interface Handlers{
+export interface Handlers{
     emit(sign:string,data:any):any;
     declare(name:string,data:any):any;
     switch(state:any):any;
@@ -6,19 +6,10 @@ interface Handlers{
     output(data:any):any;
     log(data:any):any;
 }
-type Funcs=keyof Handlers;
-function temp({emit,get,output,log}:Handlers){
-    let a=get("hello")
-    if(a==1){
-        emit("com.gaozijian.test","hello");
-        log("one");
-        output("test");
-    }
-}
 
 //函数式路线
 //自动填充以default实现
-function runner<T extends Handlers>(handler:Partial<T>){
+export function runner<T extends Handlers>(handler:Partial<T>){
     let a=Object.assign(new DefaultHandlers(),handler) as T;
     let ret=(func:(h:T)=>any)=>{
         func(a);
@@ -29,17 +20,9 @@ function runner<T extends Handlers>(handler:Partial<T>){
     rett.run=ret;
     return rett;
 }
-let a=runner({
-    emit:(a,b)=>console.log(a),
-});
-a.run((h)=>{
-    h.output("hellworodl")
-})
-a(temp);
-
 
 //handlers接口的实现
-class DefaultHandlers implements Handlers{
+export class DefaultHandlers implements Handlers{
     emit(sign: string, data: any) {
         
     }
@@ -62,8 +45,10 @@ class DefaultHandlers implements Handlers{
 
 }
 
-//注意 多重继承 代理实现
-abstract class Runner implements Handlers{
+/**
+ * 注意 多重继承 代理实现
+ */
+export abstract class Runner implements Handlers{
     //这个不可为null 且可以被动态设置
     constructor(public AgentHandlers:Handlers){
 
@@ -92,8 +77,8 @@ abstract class Runner implements Handlers{
 
 }
 //写一个runner 此处为面向对象路线
-class MyRunner extends Runner{
-    protected run<T extends any[]>(...args: T) {
-        this.output("helllfasdf")
-    }
-}
+// class MyRunner extends Runner{
+//     protected run<T extends any[]>(...args: T) {
+//         this.output("helllfasdf")
+//     }
+// }

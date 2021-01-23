@@ -1,7 +1,9 @@
-dist
+src
 **/node_modules/*
 .vscode
 *.ps1
 webpack.config.js
-*.tsx
+dist/*.tsx
+dist/*.ts
 *.html
+*.tsbuildinfo

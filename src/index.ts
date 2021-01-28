@@ -6,13 +6,23 @@ export interface Handlers{
     output(data:any):any;
     log(data:any):any;
 }
+//接收handlers的函数
+export type ScopedFunction=(handler:Handlers)=>(...args)=>any;
+//别名 handlers语义上可以作为Env使用 及作为一个“虚拟机的环境” 此时需要有一个自定义的类来实现它
+export type IEnv=Handlers;
 
+
+//允许对象patch操作
+function defaultValue<Interface,T extends Interface=Interface>(obj:Partial<Interface>,defaultV:T):Interface{
+    //如果obj中有的就覆盖默认值
+    return Object.assign(defaultV,obj);
+}
 //函数式路线
 //自动填充以default实现
-export function runner<T extends Handlers>(handler:Partial<T>){
-    let a=Object.assign(new DefaultHandlers(),handler) as T;
-    let ret=(func:(h:T)=>any)=>{
-        func(a);
+export function runner(handler:Partial<Handlers>){
+    let a=defaultValue(handler,new DefaultHandlers());
+    let ret=(func:ScopedFunction,...args)=>{
+        return func(a)(...args)
     };
     let rett=ret as (typeof ret&{
         run:typeof ret;
@@ -20,8 +30,14 @@ export function runner<T extends Handlers>(handler:Partial<T>){
     rett.run=ret;
     return rett;
 }
+/**
+ * 其中 如果handler作为一个可以修改的变量存在时，且在外部动态给定钩子函数时 在函数式层面上 是handlers语义
+ * 如果直接给定一个内部有scope的，自定义的封闭的类，则在面向对象层面上，属于IEnv语义
+ * runner(new DefaultHandlers()).run(xxxx)
+ * runner(new xxxx())(xxxx)
+ */
 
-//handlers接口的实现
+//handlers接口的默认实现，其实就是没有实现
 export class DefaultHandlers implements Handlers{
     emit(sign: string, data: any) {
         
@@ -41,44 +57,14 @@ export class DefaultHandlers implements Handlers{
     log(data: any) {
         
     }
-
-
 }
 
-/**
- * 注意 多重继承 代理实现
- */
-export abstract class Runner implements Handlers{
-    //这个不可为null 且可以被动态设置
-    constructor(public AgentHandlers:Handlers){
 
-    }
-    //代理实现 作为一个handler包装器
-    emit(sign: string, data: any) {
-        return this.AgentHandlers.emit(sign,data);
-    }
-    declare(name: string, data: any) {
-         return this.AgentHandlers.declare(name,data)
-    }
-    switch(state: any) {
-         return this.AgentHandlers.switch(state);
-    }
-    get(key: any) {
-         return this.AgentHandlers.get(key);
-    }
-    output(data: any) {
-         return this.AgentHandlers.output(data);
-    }
-    log(data: any) {
-         return this.AgentHandlers.log(data);
-    }
-    //嵌入运行
-    protected abstract run<T extends any[]>(...args:T);
-
+interface AgentMinix<T>{
+    //get set属性
+    Agent:T;
 }
-//写一个runner 此处为面向对象路线
-// class MyRunner extends Runner{
-//     protected run<T extends any[]>(...args: T) {
-//         this.output("helllfasdf")
-//     }
-// }
+type AgentSetted<T,A>=T&AgentMinix<A>;
+function useAgent<T>()
+
+
